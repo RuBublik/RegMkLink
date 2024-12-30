@@ -1,7 +1,5 @@
 # regmklink
 
-A specialized Windows registry symbolic link creation tool for security research and advanced system configuration.
-
 ## Overview
 
 `regmklink` is a command-line utility designed to create and delete symbolic links within the Windows Registry.
@@ -39,16 +37,22 @@ regmklink.exe HKLM "\REGISTRY\MACHINE\SOFTWARE\MySymLink" -d
 
 ## Short Technical Summary
 
-Registry symbolic links are keys that point to other keys within the same hive. The native windows registry editor (`regedit.exe`) actually does not show any visible distinction between regular keys and link keys. However, a common example for such symlink is - `HKEY_LOCAL_MACHINE\System\CurrentControlSet`, which links to `HKEY_LOCAL_MACHINE\System\ControlSet001` (usually).
+Registry symbolic links are keys that point to other keys within the same hive. 
+
+The native windows registry editor actually does not show any visible distinction between regular keys and link keys.
+A common example for such symlink is - `HKEY_LOCAL_MACHINE\System\CurrentControlSet`, which links to `HKEY_LOCAL_MACHINE\System\ControlSet001` (usually).
+
+In contrast to `regedit.exe`, see how this same key is seen in [TotalReg.exe](https://github.com/zodiacon/AllTools/blob/master/TotalReg.exe) (-:
+![TotalReg.exe](./images/TotalReg.png)
 
 ### Creating a Registry Link
 
 1. When created a key using `RegCreateKeyEx`, this flag should be used: `REG_OPTION_CREATE_LINK` - specifying that the key is intended to function as a link rather than a standard key.
-2. Under the new "link" key, what actually points to the target key is a string value named `SymbolicLinkValue`. (\*path to the target key must be mentioned as native/absolute).
+2. Under the new "link" key, what actually points to the target key is a `REG_LINK` value named `SymbolicLinkValue`. (\*path to the target key must be mentioned as native/absolute).
 
 ### Deleting a Registry Link
 
-Note that deleting link keys is a bit more complicated than creating ones, since this requires using the native `NtDeleteKey` function, which has to be dynamically resolved from `ntdll.dll`,
+Note that deleting link keys is a bit more complicated than creating ones, since this requires using the native `NtDeleteKey` function, which has to be dynamically resolved from `ntdll.dll`. The standard variations of `RegDeleteKey` would follow the link delete the target (-:
 
 
 
